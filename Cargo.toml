@@ -1,0 +1,11 @@
+[package]
+name = "qa-read"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+polars = { version = "0.52.0", features = ["lazy", "csv", "nightly", "performant", "dtype-date", "dtype-u8", "dtype-i8", "dtype-datetime", "serde", "docs", "timezones"] }
+qa-settings = { git = "https://github.com/sqlagentgilmore/qa-settings.git" }
+calamine = { git = "https://github.com/siqpush/calamine.git", features = ["chrono"] }
+phf = { version = "0.13.1", features = ["macros"] }
+polars-core = { version = "0.52.0", features = ["dtype-i8", "dtype-u8", "dtype-date", "dtype-datetime", "serde", "lazy", "dsl-schema", "docs", "timezones"] }

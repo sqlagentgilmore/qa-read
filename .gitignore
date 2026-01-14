@@ -1,0 +1,8 @@
+/target
+*.csv
+*.txt
+*.xlsx
+./.idea
+*.zip
+/test-assets
+.idea/
