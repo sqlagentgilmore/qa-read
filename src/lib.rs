@@ -237,6 +237,9 @@ impl Read for &'_ Reader<'_, PhantomTableReader> {
         // next for each column in schema
         let mut cycle_columns = (0..schema_len).cycle();
         let mut columns = Vec::with_capacity(schema.len());
+        for _ in 0..schema.len() {
+            columns.push(Vec::<AnyValue>::with_capacity(1000));
+        }
         for row in tables.data().rows() {
             for col in row {
                 // Safety: cycle_schema is guaranteed to have enough elements because empty schema is checked earlier
