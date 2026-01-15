@@ -229,6 +229,7 @@ impl Read for &'_ Reader<'_, PhantomTableReader> {
     fn read(&self, file: &Path) -> Result<LazyFrame, Box<dyn std::error::Error>> {
         let meta = self.metadata();
         let mut wb: Xlsx<_> = calamine::open_workbook(file)?;
+        wb.load_tables()?;
         let tables = wb.table_by_name(meta.as_str())?;
 
         let schema = self.schema()?;
