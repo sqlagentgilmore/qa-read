@@ -10,6 +10,7 @@ use polars_core::prelude::{AnyValue, DataFrame, DataType};
 use qa_settings::Comparable;
 use std::marker::PhantomData;
 use std::path::Path;
+use qa_settings::qa_kind::QaKind;
 
 pub struct Reader<'a, T> {
     inner: Comparable,
@@ -19,28 +20,28 @@ pub struct Reader<'a, T> {
 pub fn get_lazy_frames(
     comp: &Comparable,
 ) -> Result<(LazyFrame, LazyFrame), Box<dyn std::error::Error>> {
-    match comp.kind().as_str_kind() {
-        "Txt" => Reader {
+    match comp.kind() {
+        QaKind::Txt | QaKind::Csv => Reader {
             inner: comp.clone(),
             _reader: &PhantomData::<PhantomTxtReader>::default(),
         }
         .get_lazy_frames(),
-        "XlsxPivotTable" => Reader {
+        QaKind::PivotTable(_) => Reader {
             inner: comp.clone(),
             _reader: &PhantomData::<PhantomPivotTableReader>::default(),
         }
         .get_lazy_frames(),
-        "XlsxTable" => Reader {
+        QaKind::Table(_) => Reader {
             inner: comp.clone(),
             _reader: &PhantomData::<PhantomTableReader>::default(),
         }
         .get_lazy_frames(),
-        "XlsxSheetRange" => Reader {
+        QaKind::SheetRange(_) => Reader {
             inner: comp.clone(),
             _reader: &PhantomData::<PhantomSheetRangeReader>::default(),
         }
         .get_lazy_frames(),
-        _kind => Err(format!("Reader for kind '{}' is not implemented", _kind).into()),
+        _kind => Err(format!("Reader for kind '{}' is not implemented", _kind.as_str_kind()).into()),
     }
 }
 
