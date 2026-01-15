@@ -16,17 +16,47 @@ pub struct Reader<'a, T> {
     _reader: &'a PhantomData<T>,
 }
 
-impl<T> Reader<'_, T>
-where
-    Self: Read,
-{
+pub fn get_lazy_frames(
+    comp: &Comparable,
+) -> Result<(LazyFrame, LazyFrame), Box<dyn std::error::Error>> {
+    match comp.kind().as_str_kind() {
+        "Txt" => Reader {
+            inner: comp.clone(),
+            _reader: &PhantomData::<PhantomTxtReader>::default(),
+        }
+        .get_lazy_frames(),
+        "XlsxPivotTable" => Reader {
+            inner: comp.clone(),
+            _reader: &PhantomData::<PhantomPivotTableReader>::default(),
+        }
+        .get_lazy_frames(),
+        "XlsxTable" => Reader {
+            inner: comp.clone(),
+            _reader: &PhantomData::<PhantomTableReader>::default(),
+        }
+        .get_lazy_frames(),
+        "XlsxSheetRange" => Reader {
+            inner: comp.clone(),
+            _reader: &PhantomData::<PhantomSheetRangeReader>::default(),
+        }
+        .get_lazy_frames(),
+        _kind => Err(format!("Reader for kind '{}' is not implemented", _kind).into()),
+    }
+}
+
+impl<T> Reader<'_, T> {
     pub fn new(comp: Comparable) -> Self {
         Self {
             inner: comp,
             _reader: &PhantomData,
         }
     }
-    pub fn get_lazy_frames(&self) -> Result<(LazyFrame, LazyFrame), Box<dyn std::error::Error>> {
+    pub fn get_lazy_frames<'a>(
+        &'a self,
+    ) -> Result<(LazyFrame, LazyFrame), Box<dyn std::error::Error>>
+    where
+        &'a Self: Read,
+    {
         let left = self.read(self.inner.left_path())?;
         let right = self.read(self.inner.right_path())?;
         Ok((left, right))
